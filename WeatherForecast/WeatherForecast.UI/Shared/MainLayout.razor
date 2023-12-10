@@ -7,15 +7,18 @@
 <MudSnackbarProvider />
 
 <div class="page">
-    <div class="sidebar">
+    @* <div class="sidebar">
         <NavMenu />
-    </div>
+    </div> *@
 
     <main>
-        <div class="top-row px-4">
+        @* <div class="top-row px-4">
             <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
-        </div>
-
+        </div> *@
+        <MudAppBar Color="Color.Warning" Fixed="false">
+            <MudIconButton Icon="@Icons.Material.Filled.WbSunny" Color="Color.Inherit" Edge="Edge.Start" /> Weather Forecast
+            <MudSpacer />
+        </MudAppBar>
         <article class="content px-4">
             @Body
         </article>
