@@ -1,10 +1,14 @@
 ﻿@page "/"
 
+@using System.Globalization
+@using WeatherForecast.UI.Data
+@inject IWeatherForecastService _weatherForecastService
+
 <PageTitle>Weather Forecast</PageTitle>
 
 <style>
     .mud-elevation-1 {
-    box-shadow: none;
+        box-shadow: none;
     }
 
     .split-div {
@@ -16,6 +20,7 @@
     .left {
         text-align: left;
     }
+
     .right {
         text-align: right;
     }
@@ -23,11 +28,14 @@
     .centered-div {
         text-align: center;
         margin-bottom: 10px;
-        
     }
 
         .centered-div i {
             font-size: 36px;
+        }
+        
+        .centered-div img {
+            /* font-size: 36px; */
         }
 
         .centered-div span {
@@ -43,6 +51,10 @@
     .right-content {
         margin-left: auto;
     }
+
+    .temp-text {
+        font-size: 36px;
+    }
 </style>
 
 <MudPaper MinHeight="100%" Width="100%">
@@ -53,52 +65,87 @@
             </div>
             <div class="split-div">
                 <p class="left">Şuanki Hava Durumu</p>
-                <p class="right">23:14</p>
+                <p class="right">@DateTime.Now.ToShortTimeString()</p>
             </div>
-            <div class="centered-div">
-                <i class="fa-solid fa-cloud-moon-rain"><span></span>7.73°</i>
-            </div>
-            <div class="centered-div">
-                <span>Parçalı Az Bulutlu</span>
-            </div>
-            
-            <MudList Clickable="false">
-                <MudListItem>
-                    <div class="list-item-content">
-                        <span class="left-content">En Düşük Sıcaklık</span>
-                        <span class="right-content">7.26°</span>
-                    </div>
-                </MudListItem>
-                <MudDivider />
-                <MudListItem>
-                    <div class="list-item-content">
-                        <span class="left-content">En Yüksek Sıcaklık</span>
-                        <span class="right-content">8.09°</span>
-                    </div>
-                </MudListItem>
-                <MudDivider />
-                <MudListItem>
-                    <div class="list-item-content">
-                        <span class="left-content">Nem</span>
-                        <span class="right-content">%87</span>
-                    </div>
-                </MudListItem>
-                <MudDivider />
-                <MudListItem>
-                    <div class="list-item-content">
-                        <span class="left-content">Basınç</span>
-                        <span class="right-content">1017hPa</span>
-                    </div>
-                </MudListItem>
-                <MudDivider />
-                <MudListItem>
-                    <div class="list-item-content">
-                        <span class="left-content">Rüzgar</span>
-                        <span class="right-content">KuzeyDoğu 2.57 m/s</span>
-                    </div>
-                </MudListItem>
-            </MudList>
+            @if (_weatherForecast.main is not null)
+            {
+                <div class="centered-div" style="display: flex; align-items: center; justify-content: center;">
+                    @* <i class="fa-solid fa-cloud-moon-rain"> *@
+                    <img src="@_weatherIcon" style="width: 100px; height: 100px; font-size: 36px;" alt="Weather Icon" />
+                    <p class="temp-text">@_weatherForecast.main.temp °</p>
+                    @* </i> *@
+                </div>
+                <div class="centered-div">
+                    <span>@CultureInfo.CurrentCulture.TextInfo.ToTitleCase(_weatherForecast.weather[0].description.ToLower())</span>
+                </div>
+
+                <MudList Clickable="false">
+                    <MudListItem>
+                        <div class="list-item-content">
+                            <span class="left-content">En Düşük Sıcaklık</span>
+                            <span class="right-content">@_weatherForecast.main.temp_min °</span>
+                        </div>
+                    </MudListItem>
+                    <MudDivider />
+                    <MudListItem>
+                        <div class="list-item-content">
+                            <span class="left-content">En Yüksek Sıcaklık</span>
+                            <span class="right-content">@_weatherForecast.main.temp_max °</span>
+                        </div>
+                    </MudListItem>
+                    <MudDivider />
+                    <MudListItem>
+                        <div class="list-item-content">
+                            <span class="left-content">Nem</span>
+                            <span class="right-content">% @_weatherForecast.main.humidity</span>
+                        </div>
+                    </MudListItem>
+                    <MudDivider />
+                    <MudListItem>
+                        <div class="list-item-content">
+                            <span class="left-content">Basınç</span>
+                            <span class="right-content">@_weatherForecast.main.pressure hPa</span>
+                        </div>
+                    </MudListItem>
+                    <MudDivider />
+                    <MudListItem>
+                        <div class="list-item-content">
+                            <span class="left-content">Rüzgar</span>
+                            <span class="right-content">@_weatherForecast.wind.speed m/s</span>
+                        </div>
+                    </MudListItem>
+                </MudList>
+            }
 
         </MudPaper>
     </MudContainer>
 </MudPaper>
+
+@code {
+    private WeatherForecast _weatherForecast = new WeatherForecast();
+    private string _weatherIcon;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Hava durumu bilgisi çekiliyor..
+        var weatherForecast = await _weatherForecastService.GetWeatherForecastAsync();
+        if (weatherForecast != null)
+        {
+            // İstek başarılıysa
+            _weatherForecast = weatherForecast;
+            // İkon için url bilgisi alınıyor..
+            var icon = await _weatherForecastService.GetWeatherIconAsync(_weatherForecast.weather[0].icon);
+            if (icon is not null)
+            {
+                _weatherIcon = icon;
+            }
+            // Razor bileşenine bir değişiklik olduğunu bildirir, sayfayı render eder..
+            StateHasChanged();
+        }
+        else
+        {
+            // İstek başarısız olursa..
+        }
+    }
+}
