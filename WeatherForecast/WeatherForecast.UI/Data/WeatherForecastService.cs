@@ -15,14 +15,14 @@ namespace WeatherForecast.UI.Data
         }
 
         // OpenWeatherMap API'den hava durumu tahminini almak için..
-        public async Task<WeatherForecast> GetWeatherForecastAsync()
+        public async Task<WeatherForecast> GetWeatherForecastAsync(string city)
         {
             // API anahtarý ve API'nin çaðrýlacaðý url bilgisini konfigürasyondan alýr..
             var apiKey = _configuration["OpenWeatherMap:ApiKey"];
             var weatherUrl = _configuration["OpenWeatherMap:WeatherUrl"];
 
             // API'ya GET isteði gönderiliyor..
-            HttpResponseMessage response = await _httpClient.GetAsync($"{weatherUrl}weather?units=metric&lang=tr&q=istanbul&appid={apiKey}");
+            HttpResponseMessage response = await _httpClient.GetAsync($"{weatherUrl}weather?units=metric&lang=tr&q={city}&appid={apiKey}");
 
             // API'dan gelen yanýt baþarýlýysa..
             if (response.IsSuccessStatusCode)

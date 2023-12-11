@@ -2,7 +2,7 @@
 {
     public interface IWeatherForecastService
     {
-        Task<WeatherForecast> GetWeatherForecastAsync();
+        Task<WeatherForecast> GetWeatherForecastAsync(string city);
         Task<string> GetWeatherIconAsync(string iconId);
     }
 }
