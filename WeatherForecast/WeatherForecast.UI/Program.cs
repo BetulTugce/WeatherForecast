@@ -1,3 +1,4 @@
+using Blazored.SessionStorage;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using MudBlazor.Services;
@@ -10,6 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddMudServices();
+builder.Services.AddBlazoredSessionStorage();
 
 // API ile iletiþim kurmak için servis eklendi.
 builder.Services.AddHttpClient();

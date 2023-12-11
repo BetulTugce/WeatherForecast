@@ -3,6 +3,7 @@
 @using System.Globalization
 @using WeatherForecast.UI.Data
 @inject IWeatherForecastService _weatherForecastService
+@inject Blazored.SessionStorage.ISessionStorageService session
 
 <PageTitle>Weather Forecast</PageTitle>
 
@@ -58,7 +59,7 @@
 </style>
 
 
-<MudSelect Dense="true" T="string" Label="Şehir" Variant="Variant.Text" Placeholder="İstanbul" ValueChanged=@(args => OnCityChanged(args))>
+<MudSelect Dense="true" T="string" Label="Şehir" Variant="Variant.Text" Placeholder="@selectedCity" ValueChanged=@(args => OnCityChanged(args))>
     @for (int i = 0; i < cities.Count(); i++)
     {
         <MudSelectItem Value="@(cities[i])" />
@@ -132,6 +133,7 @@
 @code {
     private WeatherForecast _weatherForecast = new WeatherForecast();
     private string _weatherIcon;
+    string selectedCity = "";
 
     private string[] cities = { "Adana", "Adıyaman", "Afyonkarahisar", "Ağrı", "Amasya", "Ankara", "Antalya", "Artvin",
         "Aydın", "Balıkesir", "Bilecik", "Bingöl", "Bitlis", "Bolu", "Burdur", "Bursa", "Çanakkale",
@@ -145,8 +147,15 @@
 
     protected override async Task OnInitializedAsync()
     {
-        // Hava durumu bilgisi çekiliyor..
-        await GetWeatherForecastAsync("İstanbul");
+        await LoadWeatherDataAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        // Önceki seçilen şehiri sessiondan alır..
+        selectedCity = await session.GetItemAsync<string>("selectedCity");
+
+        await LoadWeatherDataAsync();
     }
 
     // Hava durumu bilgisi çekiliyor..
@@ -172,9 +181,24 @@
         }
     }
 
-    // Şehir değişikliği event handler fonksiyonu. Seçilen şehir değiştiğinde çalışır..
-    async void OnCityChanged(string newValue)
+    // Hava durumu bilgisini yüklemek için kullanılan fonksiyon.
+    async Task LoadWeatherDataAsync()
     {
+        // Eğer sessionda kayıtlı bir seçilen şehir yoksa, varsayılan olarak İstanbul'u kullanır..
+        if (string.IsNullOrEmpty(selectedCity))
+        {
+            selectedCity = "İstanbul";
+        }
+
+        // Hava durumu bilgisi çekiliyor..
+        await GetWeatherForecastAsync(selectedCity);
+    }
+
+    // Şehir değişikliği event handler fonksiyonu. Seçilen şehir değiştiğinde çalışır..
+    async Task OnCityChanged(string newValue)
+    {
+        // Seçilen şehiri sessiona kaydeder..
+        await session.SetItemAsync("selectedCity", newValue);
         //Hava durumu bilgisi çekiliyor..
         await GetWeatherForecastAsync(newValue);
 
