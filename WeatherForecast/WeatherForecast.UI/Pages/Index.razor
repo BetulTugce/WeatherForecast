@@ -12,6 +12,26 @@
         box-shadow: none;
     }
 
+    .container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .mud-select-container,
+    .mud-paper-container {
+        width: 100%;
+    }
+
+    .mud-paper-container {
+        margin-top: 10px;
+    }
+    
+    .mud-select {
+        width: 50%;
+        margin: 0 auto;
+    }
+
     .split-div {
         justify-content: space-between;
         display: flex;
@@ -59,76 +79,85 @@
 </style>
 
 
-<MudSelect Dense="true" T="string" Label="Şehir" Variant="Variant.Text" Placeholder="@selectedCity" ValueChanged=@(args => OnCityChanged(args))>
-    @for (int i = 0; i < cities.Count(); i++)
-    {
-        <MudSelectItem Value="@(cities[i])" />
-    }
-</MudSelect>
-
-<MudPaper MinHeight="100%" Width="100%">
-    <MudContainer MaxWidth="MaxWidth.Small">
-        <MudPaper Height="100%" Width="100%" Square="true" style="padding:10px;" Class="mud-theme-warning">
-            <div style="margin-top: 10px;" class="centered-div">
-                <p>@DateTime.Now.ToShortDateString()</p>
-            </div>
-            <div class="split-div">
-                <p class="left">Şuanki Hava Durumu</p>
-                <p class="right">@DateTime.Now.ToShortTimeString()</p>
-            </div>
-            @if (_weatherForecast.main is not null)
+<div class="container">
+    <div class="mud-select-container">
+        <MudSelect class="mud-select" Dense="true" T="string" Label="Şehir" Variant="Variant.Text" Placeholder="@selectedCity" ValueChanged=@(args => OnCityChanged(args))>
+            @for (int i = 0; i < cities.Count(); i++)
             {
-                <div class="centered-div" style="display: flex; align-items: center; justify-content: center;">
-                    @* <i class="fa-solid fa-cloud-moon-rain"> *@
-                    <img src="@_weatherIcon" style="width: 100px; height: 100px; font-size: 36px;" alt="Weather Icon" />
-                    <p class="temp-text">@_weatherForecast.main.temp °</p>
-                    @* </i> *@
-                </div>
-                <div class="centered-div">
-                    <span>@CultureInfo.CurrentCulture.TextInfo.ToTitleCase(_weatherForecast.weather[0].description.ToLower())</span>
-                </div>
-
-                <MudList Clickable="false">
-                    <MudListItem>
-                        <div class="list-item-content">
-                            <span class="left-content">En Düşük Sıcaklık</span>
-                            <span class="right-content">@_weatherForecast.main.temp_min °</span>
-                        </div>
-                    </MudListItem>
-                    <MudDivider />
-                    <MudListItem>
-                        <div class="list-item-content">
-                            <span class="left-content">En Yüksek Sıcaklık</span>
-                            <span class="right-content">@_weatherForecast.main.temp_max °</span>
-                        </div>
-                    </MudListItem>
-                    <MudDivider />
-                    <MudListItem>
-                        <div class="list-item-content">
-                            <span class="left-content">Nem</span>
-                            <span class="right-content">% @_weatherForecast.main.humidity</span>
-                        </div>
-                    </MudListItem>
-                    <MudDivider />
-                    <MudListItem>
-                        <div class="list-item-content">
-                            <span class="left-content">Basınç</span>
-                            <span class="right-content">@_weatherForecast.main.pressure hPa</span>
-                        </div>
-                    </MudListItem>
-                    <MudDivider />
-                    <MudListItem>
-                        <div class="list-item-content">
-                            <span class="left-content">Rüzgar</span>
-                            <span class="right-content">@_weatherForecast.wind.speed m/s</span>
-                        </div>
-                    </MudListItem>
-                </MudList>
+                <MudSelectItem Value="@(cities[i])" />
             }
+        </MudSelect>
+    </div>
 
+    <div class="mud-paper-container">
+        <MudPaper MinHeight="100%" Width="100%">
+            <MudContainer MaxWidth="MaxWidth.Small">
+                <MudPaper Height="100%" Width="100%" Square="true" style="padding:10px;" Class="mud-theme-warning">
+                    <div style="margin-top: 10px;" class="centered-div">
+                        <p>@DateTime.Now.ToShortDateString()</p>
+                    </div>
+                    <div class="split-div">
+                        <p class="left">Şuanki Hava Durumu</p>
+                        <p class="right">@DateTime.Now.ToShortTimeString()</p>
+                    </div>
+                    @if (_weatherForecast.main is not null)
+                    {
+                        <div class="centered-div" style="display: flex; align-items: center; justify-content: center;">
+                            @* <i class="fa-solid fa-cloud-moon-rain"> *@
+                            <img src="@_weatherIcon" style="width: 100px; height: 100px; font-size: 36px;" alt="Weather Icon" />
+                            <p class="temp-text">@_weatherForecast.main.temp °</p>
+                            @* </i> *@
+                        </div>
+                        <div class="centered-div">
+                            <span>@CultureInfo.CurrentCulture.TextInfo.ToTitleCase(_weatherForecast.weather[0].description.ToLower())</span>
+                        </div>
+
+                        <MudList Clickable="false">
+                            <MudListItem>
+                                <div class="list-item-content">
+                                    <span class="left-content">En Düşük Sıcaklık</span>
+                                    <span class="right-content">@_weatherForecast.main.temp_min °</span>
+                                </div>
+                            </MudListItem>
+                            <MudDivider />
+                            <MudListItem>
+                                <div class="list-item-content">
+                                    <span class="left-content">En Yüksek Sıcaklık</span>
+                                    <span class="right-content">@_weatherForecast.main.temp_max °</span>
+                                </div>
+                            </MudListItem>
+                            <MudDivider />
+                            <MudListItem>
+                                <div class="list-item-content">
+                                    <span class="left-content">Nem</span>
+                                    <span class="right-content">% @_weatherForecast.main.humidity</span>
+                                </div>
+                            </MudListItem>
+                            <MudDivider />
+                            <MudListItem>
+                                <div class="list-item-content">
+                                    <span class="left-content">Basınç</span>
+                                    <span class="right-content">@_weatherForecast.main.pressure hPa</span>
+                                </div>
+                            </MudListItem>
+                            <MudDivider />
+                            <MudListItem>
+                                <div class="list-item-content">
+                                    <span class="left-content">Rüzgar</span>
+                                    <span class="right-content">@_weatherForecast.wind.speed m/s</span>
+                                </div>
+                            </MudListItem>
+                        </MudList>
+                    }
+
+                </MudPaper>
+            </MudContainer>
         </MudPaper>
-    </MudContainer>
-</MudPaper>
+    </div>
+    
+</div>
+
+
 
 @code {
     private WeatherForecast _weatherForecast = new WeatherForecast();
@@ -147,15 +176,22 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadWeatherDataAsync();
+        await GetWeatherForecastAsync(selectedCity);
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        // Önceki seçilen şehiri sessiondan alır..
-        selectedCity = await session.GetItemAsync<string>("selectedCity");
-
-        await LoadWeatherDataAsync();
+        if (firstRender)
+        {
+            // Önceki seçilen şehiri sessiondan alır..
+            selectedCity = await session.GetItemAsync<string>("selectedCity");
+            // Eğer sessionda kayıtlı bir seçilen şehir yoksa, varsayılan olarak İstanbul'u kullanır..
+            if (string.IsNullOrEmpty(selectedCity))
+            {
+                selectedCity = "İstanbul";
+            }
+            await GetWeatherForecastAsync(selectedCity);
+        }
     }
 
     // Hava durumu bilgisi çekiliyor..
@@ -179,19 +215,6 @@
         {
             // İstek başarısız olursa..
         }
-    }
-
-    // Hava durumu bilgisini yüklemek için kullanılan fonksiyon.
-    async Task LoadWeatherDataAsync()
-    {
-        // Eğer sessionda kayıtlı bir seçilen şehir yoksa, varsayılan olarak İstanbul'u kullanır..
-        if (string.IsNullOrEmpty(selectedCity))
-        {
-            selectedCity = "İstanbul";
-        }
-
-        // Hava durumu bilgisi çekiliyor..
-        await GetWeatherForecastAsync(selectedCity);
     }
 
     // Şehir değişikliği event handler fonksiyonu. Seçilen şehir değiştiğinde çalışır..

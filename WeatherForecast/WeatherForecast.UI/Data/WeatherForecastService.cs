@@ -22,7 +22,7 @@ namespace WeatherForecast.UI.Data
             var weatherUrl = _configuration["OpenWeatherMap:WeatherUrl"];
 
             // API'ya GET isteði gönderiliyor..
-            HttpResponseMessage response = await _httpClient.GetAsync($"{weatherUrl}weather?units=metric&lang=tr&q={city}&appid={apiKey}");
+            HttpResponseMessage response = await _httpClient.GetAsync($"{weatherUrl}weather?units=metric&lang=tr&country=TR&q={city}&appid={apiKey}");
 
             // API'dan gelen yanýt baþarýlýysa..
             if (response.IsSuccessStatusCode)
