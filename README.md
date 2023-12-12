@@ -40,3 +40,7 @@ The `appsettings.json` file is not included in the repository as it contains sen
     "IconUrl": "https://openweathermap.org/img/w/"
   }
 }
+
+## Screenshot
+
+![WeatherForecast](https://github.com/BetulTugce/WeatherForecast/assets/79140478/b5acbd41-d225-4b62-a8b8-388cbcf44cbf)
