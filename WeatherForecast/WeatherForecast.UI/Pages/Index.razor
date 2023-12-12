@@ -98,7 +98,7 @@
                     </div>
                     <div class="split-div">
                         <p class="left">Şuanki Hava Durumu</p>
-                        <p class="right">@DateTime.Now.ToShortTimeString()</p>
+                        <p class="right">@time</p>
                     </div>
                     @if (_weatherForecast.main is not null)
                     {
@@ -149,7 +149,10 @@
                             </MudListItem>
                         </MudList>
                     }
-
+                    else
+                    {
+                        <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
+                    }
                 </MudPaper>
             </MudContainer>
         </MudPaper>
@@ -163,6 +166,7 @@
     private WeatherForecast _weatherForecast = new WeatherForecast();
     private string _weatherIcon;
     string selectedCity = "";
+    string time = "";
 
     private string[] cities = { "Adana", "Adıyaman", "Afyonkarahisar", "Ağrı", "Amasya", "Ankara", "Antalya", "Artvin",
         "Aydın", "Balıkesir", "Bilecik", "Bingöl", "Bitlis", "Bolu", "Burdur", "Bursa", "Çanakkale",
@@ -208,6 +212,7 @@
             {
                 _weatherIcon = icon;
             }
+            time = DateTime.Now.ToShortTimeString();
             // Razor bileşenine bir değişiklik olduğunu bildirir, sayfayı render eder..
             StateHasChanged();
         }
