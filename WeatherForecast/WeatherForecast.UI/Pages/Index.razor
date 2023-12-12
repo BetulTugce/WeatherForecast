@@ -4,6 +4,9 @@
 @using WeatherForecast.UI.Data
 @inject IWeatherForecastService _weatherForecastService
 @inject Blazored.SessionStorage.ISessionStorageService session
+@inject IJSRuntime jsRuntime
+@using BrowserInterop.Extensions
+@using BrowserInterop.Geolocation
 
 <PageTitle>Weather Forecast</PageTitle>
 
@@ -178,27 +181,77 @@
         "Van", "Yozgat", "Zonguldak", "Aksaray", "Bayburt", "Karaman", "Kırıkkale", "Batman", "Şırnak", "Bartın",
         "Ardahan", "Iğdır", "Yalova", "Karabük", "Kilis", "Osmaniye", "Düzce" };
 
+    private WindowNavigatorGeolocation geolocation;
+    private GeolocationPosition geolocationPosition;
+
     protected override async Task OnInitializedAsync()
     {
-        await GetWeatherForecastAsync(selectedCity);
+        // await GetWeatherForecastAsync(selectedCity);
     }
 
+    // Bu metot, ilk render işleminden sonra çalışır..
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            // Önceki seçilen şehiri sessiondan alır..
-            selectedCity = await session.GetItemAsync<string>("selectedCity");
-            // Eğer sessionda kayıtlı bir seçilen şehir yoksa, varsayılan olarak İstanbul'u kullanır..
-            if (string.IsNullOrEmpty(selectedCity))
+            // Tarayıcı penceresi ve navigator üzerinden geolocation nesnesini alınır..
+            var window = await jsRuntime.Window();
+            var navigator = await window.Navigator();
+            geolocation = navigator.Geolocation;
+            // Geolocation servisini kullanarak kullanıcının mevcut konumunu alınıyor..
+            geolocationPosition = (await geolocation.GetCurrentPosition(new PositionOptions()
+                {
+                    EnableHighAccuracy = true,
+                    MaximumAgeTimeSpan = TimeSpan.FromHours(1),
+                    TimeoutTimeSpan = TimeSpan.FromMinutes(1)
+                })).Location;
+
+            if (geolocationPosition is not null)
             {
-                selectedCity = "İstanbul";
+                // Eğer konum bilgisi başarıyla alındıysa, hava durumu bilgisi koordinatlara göre çekiliyor..
+                await GetWeatherForecastAsync(geolocationPosition.Coords.Latitude, geolocationPosition.Coords.Longitude);
             }
-            await GetWeatherForecastAsync(selectedCity);
+            else // Konum bilgisi alınamadıysa önceden dropdowndan şehir seçimi yapıp sessiona kaydedilmiş mi diye kontrol ediliyor..
+            {
+                // Önceki seçilen şehiri sessiondan alır..
+                selectedCity = await session.GetItemAsync<string>("selectedCity");
+                // Eğer sessionda kayıtlı bir seçilen şehir yoksa, varsayılan olarak İstanbul'u kullanır..
+                if (string.IsNullOrEmpty(selectedCity))
+                {
+                    selectedCity = "İstanbul";
+                }
+                // Hava durumu bilgisi şehir adına göre çekiliyor..
+                await GetWeatherForecastAsync(selectedCity);
+            }
         }
     }
 
-    // Hava durumu bilgisi çekiliyor..
+    // Hava durumu bilgisi çekiliyor.. (Koordinatlara göre)
+    async Task GetWeatherForecastAsync(double _lat, double _lon)
+    {
+        var weatherForecast = await _weatherForecastService.GetWeatherForecastAsync(_lat, _lon);
+        if (weatherForecast != null)
+        {
+            // İstek başarılıysa
+            _weatherForecast = weatherForecast;
+            // İkon için url bilgisi alınıyor..
+            var icon = await _weatherForecastService.GetWeatherIconAsync(_weatherForecast.weather[0].icon);
+            if (icon is not null)
+            {
+                _weatherIcon = icon;
+            }
+            time = DateTime.Now.ToShortTimeString();
+            selectedCity = _weatherForecast.name;
+            // Razor bileşenine bir değişiklik olduğunu bildirir, sayfayı render eder..
+            StateHasChanged();
+        }
+        else
+        {
+            // İstek başarısız olursa..
+        }
+    }
+
+    // Hava durumu bilgisi çekiliyor.. (Şehir ismine göre)
     async Task GetWeatherForecastAsync(string city)
     {
         var weatherForecast = await _weatherForecastService.GetWeatherForecastAsync(city);

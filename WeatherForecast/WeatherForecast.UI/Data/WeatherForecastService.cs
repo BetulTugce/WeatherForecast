@@ -14,7 +14,7 @@ namespace WeatherForecast.UI.Data
             _configuration = configuration;
         }
 
-        // OpenWeatherMap API'den hava durumu tahminini almak için..
+        // OpenWeatherMap API'den þehir adýna göre hava durumu tahminini almak için..
         public async Task<WeatherForecast> GetWeatherForecastAsync(string city)
         {
             // API anahtarý ve API'nin çaðrýlacaðý url bilgisini konfigürasyondan alýr..
@@ -24,6 +24,28 @@ namespace WeatherForecast.UI.Data
             // API'ya GET isteði gönderiliyor..
             HttpResponseMessage response = await _httpClient.GetAsync($"{weatherUrl}weather?units=metric&lang=tr&country=TR&q={city}&appid={apiKey}");
 
+            // API'dan gelen yanýt baþarýlýysa..
+            if (response.IsSuccessStatusCode)
+            {
+                // API yanýtýný okunuyor..
+                var apiResponseJson = await response.Content.ReadAsStringAsync();
+                // JSON yanýtý WeatherForecast sýnýfýna deserializasyon yaparak döner..
+                var result = JsonConvert.DeserializeObject<WeatherForecast>(apiResponseJson);
+                return result;
+            }
+
+            return null;
+        }
+
+        // OpenWeatherMap API'den koordinatlara göre hava durumu tahminini almak için..
+        public async Task<WeatherForecast> GetWeatherForecastAsync(double lat, double lon)
+        {
+            // API anahtarý ve API'nin çaðrýlacaðý url bilgisini konfigürasyondan alýr..
+            var apiKey = _configuration["OpenWeatherMap:ApiKey"];
+            var weatherUrl = _configuration["OpenWeatherMap:WeatherUrl"];
+
+            // API'ya GET isteði gönderiliyor..
+            HttpResponseMessage response = await _httpClient.GetAsync($"{weatherUrl}weather?units=metric&lang=tr&country=TR&lat={lat}&lon={lon}&appid={apiKey}");
             // API'dan gelen yanýt baþarýlýysa..
             if (response.IsSuccessStatusCode)
             {

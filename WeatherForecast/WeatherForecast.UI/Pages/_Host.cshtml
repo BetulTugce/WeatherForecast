@@ -19,10 +19,10 @@
 
     @* <link rel="icon" type="image/png" href="favicon.png"/> *@
     <link rel="icon" type="image/png" href="img/sun-solid.svg"/>
-    <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered" />
+    <component type="typeof(HeadOutlet)" render-mode="Server" />
 </head>
 <body>
-    <component type="typeof(App)" render-mode="ServerPrerendered" />
+    <component type="typeof(App)" render-mode="Server" />
 
     <div id="blazor-error-ui">
         <environment include="Staging,Production">
@@ -39,5 +39,6 @@
     @* Mud Blazor için script.. *@
     <script src="_content/MudBlazor/MudBlazor.min.js"></script>
     <script src="https://kit.fontawesome.com/3655fec723.js" crossorigin="anonymous"></script>
+    <script src="_content/BrowserInterop/scripts.js"></script>
 </body>
 </html>
