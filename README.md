@@ -40,6 +40,7 @@ The `appsettings.json` file is not included in the repository as it contains sen
     "IconUrl": "https://openweathermap.org/img/w/"
   }
 }
+```
 
 ## Screenshot
 
